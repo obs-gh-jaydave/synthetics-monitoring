@@ -22,8 +22,9 @@ This setup uses Docker to run Prometheus and Blackbox Exporter in a single conta
 
 1. Clone this repository:
 
-git clone https://github.com/obs-gh-jaydave/synthetics-monitoring.git
-cd synthetics-monitoring
+```git clone https://github.com/obs-gh-jaydave/synthetics-monitoring.git```
+
+```cd synthetics-monitoring```
 
 2. Update `prometheus.yml`:
 - Modify the `remote_write` section with your Observe Prometheus endpoint and authentication token.
