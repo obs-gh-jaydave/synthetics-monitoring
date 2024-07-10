@@ -1,0 +1,53 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - https://example.com
+        - https://api.example.com
+        - https://www.observeinc.com/
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: localhost:9115
+
+  - job_name: 'ssl_expiry'
+    metrics_path: /probe
+    params:
+      module: [ssl]
+    static_configs:
+      - targets:
+        - example.com:443
+        - api.example.com:443
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: localhost:9115
+
+remote_write:
+  - url: "https://{OBSERVE_TENANT_ID}}1.collect.observeinc.com/v1/prometheus"
+    authorization:
+      type: "Bearer"
+      credentials: "OBSERVE_API_KEY"
+    write_relabel_configs:
+      - source_labels: [__name__]
+        regex: '(.+)'
+        target_label: metric_name
+        replacement: '$1'
+    remote_timeout: 30s
+    queue_config:
+      capacity: 2500
+      max_shards: 200
+      max_samples_per_send: 500
+      batch_send_deadline: 5s
